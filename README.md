@@ -184,7 +184,7 @@ Note that during the build process a service-crontab is added to the `/etc/cront
 This file is then mounted in the `docker-compose.yml` file so as to use the provided configuration defined in the `dev`, `pre` or `pro` environment.
 This is done by the following lines in the `docker-compose.yml`.
 This means that if the frequency is expected to be changed in any of the environments, this has to be set.
-Follow the instructions on [`./PRODUCTION_RECOMMENDATIONS.md](./docs/PRODUCTION_RECOMMENDATIONS.md) to set this.
+Follow the instructions on [`./PRODUCTION_RECOMMENDATIONS.md`](./docs/PRODUCTION_RECOMMENDATIONS.md) to set this.
 
 Note that you can find more information about the project in the [`./ENVIRONMENT_VARIABLES`](./docs/ENVIRONMENT_VARIABLES.md) with more information about how to work with environment variables.
 At the same time in the [`./VOLUME_MANAGEMENT.md`](./docs/VOLUME_MANAGEMENT.md) you can find more information about how volumes are used.
