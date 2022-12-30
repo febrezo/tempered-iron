@@ -12,16 +12,25 @@ This software is licensed using GPLv3. Check the [`COPYING`](COPYING) file for f
 
 ## Dependencies
 
-Check that you have Docker and Docker Compose installed in your computer.
-Specfic instructions to do so in your OS can be found in the official docs for Docker ([here](https://docs.docker.com/get-docker/)) and Docker Compose ([here](https://docs.docker.com/compose/install/)).
+Check that you have Docker installed in your computer.
+Specfic instructions to do so in your OS can be found in the official docs for Docker ([here](https://docs.docker.com/get-docker/)). 
+Note that old versions of Docker will not install Docker Compose as part of Docker.
+This means that any reference to `docker compose` (being `compose` a subcommand of `docker`) will have to be substituted by `docker-compose`. 
+The ouptut will typically look like this:
 
-Once installed, you can check the versions using the following commands:
+```
+$ docker compose up
+docker: 'compose' is not a docker command.
+See 'docker --help'
+```
+
+In those cases, install Docker Compose as shown [here](https://docs.docker.com/compose/install/) and check the installation like this:
 
 ```
 $ docker --version
 Docker version 18.09.0, build 4d60db4
-$ docker-compose --version
-docker-compose version 1.23.1, build b02f1306
+$ docker compose --version
+docker compose version 1.23.1, build b02f1306
 ```
 
 For convenience, the `Dockerfile` will deal with the Python dependencies at building time using `pip`, but any other additional dependencies and images can be used here.
@@ -37,55 +46,50 @@ Note that some files in the config folder are deliberately not copied in the Git
 To start everything, use:
 
 ```
-$ docker-compose up 
+$ docker compose up 
 ```
 
 Note that if you make changes and you want to see them you will need the `--build` option:
 
 ```
-$ docker-compose up --build
+$ docker compose up --build
+$ docker compose up  --build
+WARNING: The APP_NAME variable is not set. Defaulting to a blank string.
+Creating network "tempered-iron_default" with the default driver
+Creating volume "dev_data_vol" with local driver
+Creating volume "dev_log_vol" with local driver
 Building main_service
-Step 1/10 : FROM python:3.10-alpine
- ---> 482b8fa3563e
-Step 2/10 : RUN apk update
+Sending build context to Docker daemon  208.4kB
+Step 1/9 : FROM python:3.10-alpine
+ ---> 2527f31628e7
+Step 2/9 : RUN touch /etc/crontabs/root
  ---> Using cache
- ---> 39bccfa17f0d
-Step 3/10 : COPY config/dev/cron.d/service-crontab /etc/cron.d/service-crontab
+ ---> 929555f6812e
+Step 3/9 : RUN chmod 0644 /etc/crontabs/root
  ---> Using cache
- ---> 11b24ce1300a
-Step 4/10 : RUN chmod 0644 /etc/cron.d/service-crontab &&    crontab /etc/cron.d/service-crontab
+ ---> b1fe1619fc32
+Step 4/9 : ADD requirements.txt /tmp/requirements.txt
  ---> Using cache
- ---> 5d5a0e2a504c
-Step 5/10 : ADD requirements.txt /tmp/requirements.txt
+ ---> f13593d70c5d
+Step 5/9 : RUN pip install -r /tmp/requirements.txt
  ---> Using cache
- ---> d8e86d8bba81
-Step 6/10 : RUN pip install -r /tmp/requirements.txt
+ ---> 2a63ab14abb4
+Step 6/9 : RUN mkdir /data
  ---> Using cache
- ---> 2e4742159266
-Step 7/10 : RUN mkdir /data
+ ---> d2331cd7c967
+Step 7/9 : ADD app /app
  ---> Using cache
- ---> 40b54851e289
-Step 8/10 : ADD app /app
- ---> 93e29a3a9aa6
-Step 9/10 : WORKDIR /app
- ---> Running in 08a379190249
-Removing intermediate container 08a379190249
- ---> 2c703d06f589
-Step 10/10 : ENTRYPOINT ["sh", "-c" , "crond -f"]
- ---> Running in ad51f1e83a7d
-Removing intermediate container ad51f1e83a7d
- ---> 425bae76ea02
-
-Successfully built 425bae76ea02
-Successfully tagged temperediron_main_service:latest
-Recreating temperediron_main_service_1 ... 
-Recreating temperediron_main_service_1 ... done
-Attaching to temperediron_main_service_1
-main_service_1  | [INFO] tempered_iron @ 2022-04-05 15:45:00,779 | Checking the public IP…
-main_service_1  | [DEBUG] tempered_iron @ 2022-04-05 15:45:00,781 | Starting new HTTPS connection (1): ifconfig.me:443
-main_service_1  | [DEBUG] tempered_iron @ 2022-04-05 15:45:01,040 | https://ifconfig.me:443 "GET / HTTP/1.1" 200 14
-main_service_1  | [INFO] tempered_iron @ 2022-04-05 15:45:01,041 | My public IP is: XX.XX.XX.XX
-main_service_1  | [INFO] tempered_iron @ 2022-04-05 15:45:01,041 | Closing the application…
+ ---> 394f5317655b
+Step 8/9 : WORKDIR /app
+ ---> Using cache
+ ---> 68e4724b652f
+Step 9/9 : ENTRYPOINT ["sh", "-c" , "crond -f"]
+ ---> Using cache
+ ---> 677d6091020d
+Successfully built 677d6091020d
+Successfully tagged tempered-iron_main_service:latest
+Creating tempered-iron_main_service_1 ... done
+Attaching to tempered-iron_main_service_1
 ```
 
 Once started, the deployed container will start a cron service to run schedule tasks.
@@ -93,19 +97,19 @@ In this context, the scheduled task is as simple as grabbing the public IP addre
 
 ## Additional Docker and Docker Compose Tips
 
-To stop the containers, you can always use `docker-compose down` from the project home.
-At the same time, to reraise without building, use `docker-compose up`.
+To stop the containers, you can always use `docker compose down` from the project home.
+At the same time, to reraise without building, use `docker compose up`.
 Note that this approach will show the output in the terminal.
 However, running this in detached mode can be useful.
 
 ```
-$ docker-compose up -d
+$ docker compose up -d
 ```
 
-To grab the logs of a specifc container set up using `docker-compose` you can use a specific command: `docker-compose logs <service_name>` as follows:
+To grab the logs of a specifc container set up using `docker-compose` you can use a specific command: `docker compose logs <service_name>` as follows:
 
 ```
-$ docker-compose logs
+$ docker compose logs
 Attaching to temperediron_main_service_1
 main_service_1  | [INFO] tempered_iron @ 2022-04-05 15:45:00,779 | Checking the public IP…
 main_service_1  | [DEBUG] tempered_iron @ 2022-04-05 15:45:00,781 | Starting new HTTPS connection (1): ifconfig.me:443
@@ -118,10 +122,10 @@ main_service_1  | [INFO] tempered_iron @ 2022-04-05 15:52:00,964 | Closing the a
 ```
 
 With this approach, the application will end a return to the prompt.
-However, if you prefer to _follow_ the logs, you can use the `-f` or `--follow` as shown with `docker-compose logs --help` so as to let the application wait for new lines:
+However, if you prefer to _follow_ the logs, you can use the `-f` or `--follow` as shown with `docker compose logs --help` so as to let the application wait for new lines:
 
 ```
-$ docker-compose logs --help
+$ docker compose logs --help
 View output from containers.
 
 Usage: logs [options] [SERVICE...]
@@ -132,50 +136,41 @@ Options:
     -t, --timestamps    Show timestamps.
     --tail="all"        Number of lines to show from the end of the logs
                         for each container.
-$ docker-compose logs -f
+$ docker compose logs -f
 ```
 
-Note that for debugging purposes you might find useful to enter the container using a shell.
-This can be done using `docker exec -it` command once you know the name of the container.
-In the aformentioned case, you can see in that the ID of the container is `425bae76ea02` from the output.
+Once started, the deployed container will start a cron service to run scheduled tasks as stated in the `/etc/crontabs/root` file within the container.
+In this context, the scheduled task is as simple as grabbing the public IP address and logging it both, in the terminal and in a specific log file under `/log` in the container and in a volume mounted in the host.
 
-If you have already run the container, you can check the running ones using `docker ps` to get the ID of the container you want to enter.
+### Basic debugging
+
+Note that when developing the application things may crash.
+This WILL happen.
+You can enter the container and run manually the application by listing the containers and opening a shell on it.
+To do so:
+
+1. List the containers being run (YOU SHOULD HAVE NOT STOPPED THE CONTAINER BY YOURSELF!):
 
 ```
 $ docker ps
-CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS         PORTS     NAMES
-cf5d42a2da7d   temperediron_main_service   "sh -c 'crond -f' sh…"   2 minutes ago   Up 2 minutes             temperediron_main_service_1
+CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS              PORTS     NAMES
+29a49899accb   temperediron_main_service   "sh -c 'crond -f' sh…"   21 seconds ago   Up 20 seconds                 temperediron_main_service_1
 ```
 
-In this case, entering the container is as simple as entering the container with a shell in interactive mode (`-it`).
-Note that the default shell of Alpine containers is `sh`, but use `bash` if it is available in the Docker image you used as a base image.
+2. Identify the `CONTAINER ID`. In this case, `29a49899accb`.
+
+3. Logging into the container:
 
 ```
-$ docker exec -it cf5d42a2da7d sh
+$ docker exec -it 29a49899accb sh
+/app # whoami
+root
 /app # ls
 run.py
-/app # python3 run.py 
-[INFO] tempered_iron @ 2022-04-05 15:49:08,761 | Checking the public IP…
-[DEBUG] tempered_iron @ 2022-04-05 15:49:08,763 | Starting new HTTPS connection (1): ifconfig.me:443
-[DEBUG] tempered_iron @ 2022-04-05 15:49:08,928 | https://ifconfig.me:443 "GET / HTTP/1.1" 200 14
-[INFO] tempered_iron @ 2022-04-05 15:49:08,930 | My public IP is: XX.XX.XX.XX
-[INFO] tempered_iron @ 2022-04-05 15:49:08,930 | Closing the application…
-/app # cd /log/
-/log # ls
-tempered_iron.log
-/log # tail -n 10 tempered_iron.log 
-[INFO] tempered_iron @ 2022-04-05 15:49:00,727 | Checking the public IP…
-[DEBUG] tempered_iron @ 2022-04-05 15:49:00,729 | Starting new HTTPS connection (1): ifconfig.me:443
-[DEBUG] tempered_iron @ 2022-04-05 15:49:00,940 | https://ifconfig.me:443 "GET / HTTP/1.1" 200 14
-[INFO] tempered_iron @ 2022-04-05 15:49:00,942 | My public IP is: XX.XX.XX.XX
-[INFO] tempered_iron @ 2022-04-05 15:49:00,942 | Closing the application…
-[INFO] tempered_iron @ 2022-04-05 15:49:08,761 | Checking the public IP…
-[DEBUG] tempered_iron @ 2022-04-05 15:49:08,763 | Starting new HTTPS connection (1): ifconfig.me:443
-[DEBUG] tempered_iron @ 2022-04-05 15:49:08,928 | https://ifconfig.me:443 "GET / HTTP/1.1" 200 14
-[INFO] tempered_iron @ 2022-04-05 15:49:08,930 | My public IP is: XX.XX.XX.XX
-[INFO] tempered_iron @ 2022-04-05 15:49:08,930 | Closing the application…
+/app # 
 ```
 
+You are now in the container! Have fun!
 
 ## Additional Tuning
 
@@ -188,5 +183,4 @@ Follow the instructions on [`./PRODUCTION_RECOMMENDATIONS.md`](./docs/PRODUCTION
 
 Note that you can find more information about the project in the [`./ENVIRONMENT_VARIABLES`](./docs/ENVIRONMENT_VARIABLES.md) with more information about how to work with environment variables.
 At the same time in the [`./VOLUME_MANAGEMENT.md`](./docs/VOLUME_MANAGEMENT.md) you can find more information about how volumes are used.
-
 

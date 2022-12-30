@@ -4,18 +4,12 @@ services:
   main_service:
     build: .
     command: sh -c "crond -f"
-    restart: on-failure:5
+    #restart: unless-stopped
+    environment:
+      - APP_NAME=${APP_NAME}
     env_file:
-      - ./config/${ENVIRONMENT:-dev}/service_variables.env
+      - ./config/${ENVIRONMENT:-dev}/variables.env
     volumes:
-      - data_vol:/data
-      - log_vol:/log
-      - ./config/${ENVIRONMENT:-dev}/cron.d:/etc/cron.d
-
-volumes:
-  data_vol:
-    name: ${ENVIRONMENT:-dev}_data_vol
-    driver: local
-  log_vol:
-    name: ${ENVIRONMENT:-dev}_log_vol
-    driver: local
+      - ./volumes/data:/data
+      - ./volumes/log:/log
+      - ./config/${ENVIRONMENT:-dev}/crontabs:/etc/crontabs

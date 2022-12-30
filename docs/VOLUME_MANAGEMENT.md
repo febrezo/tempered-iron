@@ -5,17 +5,17 @@ They can be used to share the contents of a folder in the host with the containe
 
 ## Conventional Approach
 
-Typically, in `docker-compose` you can define volumes with absolute paths in the host.
+Typically, in the `docker-compose.yml` you can define volumes with absolute paths in the host.
 For example,
 ```
 ...
     volumes:
-      - ./data_vol:/data
-      - ./log_vol:/log
+      - ./volumes/data:/data
+      - ./volumes/log:/log
 ...
 ```
 
-This would map a local folder located at `./data_vol` (relative to the `docker-compose.yml` path) with a volume that will be mounted at `/data/`.
+This would map a local folder located at `./volumes/data` (relative to the `docker-compose.yml` path) with a volume that will be mounted at `/data/`.
 Thus, the contents located at the folder can be accessed from both, the container and the host.
 
 ## Production ready
@@ -53,7 +53,7 @@ services
     volumes:
       - data_vol:/data
       - log_vol:/log
-      - ./config/${ENVIRONMENT:-dev}/cron.d:/etc/cron.d
+      - ./config/${ENVIRONMENT:-dev}/crontabs:/etc/crontabs
 
 volumes:
   data_vol:
@@ -73,7 +73,7 @@ services
     volumes:
       - data_vol:/data
       - log_vol:/log
-      - ./config/${ENVIRONMENT:-dev}/cron.d:/etc/cron.d
+      - ./config/${ENVIRONMENT:-dev}/crontabs:/etc/crontabs
 volumes:
   data_vol:
     name: pro_data_vol
@@ -86,5 +86,5 @@ volumes:
 This is good because different environments can be used safely in a single machine without mixing others.
 Of course, additional volumes can be added depending on the needs.
 
-The only exception as shown above is the example of the configuration of how the `/etc/cron.d/` is mapped from the host.
-This information is grabbed from the `./config/${ENVIRONMENT}/cron.d` folder meaning that the scheduled tasks can be mapped at deployment time.
+The only exception as shown above is the example of the configuration of how the `/etc/crontabs/` is mapped from the host.
+This information is grabbed from the `./config/${ENVIRONMENT}/crontabs` folder meaning that the scheduled tasks can be mapped at deployment time.

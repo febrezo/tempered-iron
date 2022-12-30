@@ -5,7 +5,7 @@ import sys
 
 
 # Grabbing environment variables
-LOGGER_NAME = os.environ.get("LOGGER_NAME", "Default App Logger")
+LOGGER_NAME = os.environ.get("APP_NAME", "tempered-iron")
 LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
 
 logging.basicConfig(

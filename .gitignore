@@ -1,4 +1,6 @@
-pre/*.env
-pro/*.env
-pre/*-crontab
-pro/*-crontab
+config/pre/*.env
+config/pro/*.env
+config/pre/crontabs/*
+config/pro/crontabs/*
+.env
+volumes
