@@ -1,12 +1,9 @@
 FROM python:3.10-alpine
 
-RUN apk update
-
-# Setting a default crontab for the service
-COPY config/dev/cron.d/service-crontab /etc/cron.d/service-crontab
-
-RUN chmod 0644 /etc/cron.d/service-crontab &&\
-    crontab /etc/cron.d/service-crontab
+# Installing a blank crontab for the user 'root' in the service
+RUN touch /etc/crontabs/root
+# Setting permissions to make the file writable only by the owner
+RUN chmod 0644 /etc/crontabs/root
 
 # Fixing Python deps
 ADD requirements.txt /tmp/requirements.txt
