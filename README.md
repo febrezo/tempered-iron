@@ -53,43 +53,46 @@ Note that if you make changes and you want to see them you will need the `--buil
 
 ```
 $ docker compose up --build
-$ docker compose up  --build
-WARNING: The APP_NAME variable is not set. Defaulting to a blank string.
-Creating network "tempered-iron_default" with the default driver
-Creating volume "dev_data_vol" with local driver
-Creating volume "dev_log_vol" with local driver
 Building main_service
-Sending build context to Docker daemon  208.4kB
+Sending build context to Docker daemon  221.2kB
 Step 1/9 : FROM python:3.10-alpine
  ---> 2527f31628e7
-Step 2/9 : RUN touch /etc/crontabs/root
+Step 2/9 : COPY ./docker-entrypoint.sh /
  ---> Using cache
- ---> 929555f6812e
-Step 3/9 : RUN chmod 0644 /etc/crontabs/root
+ ---> 19f8ffddb714
+Step 3/9 : ADD requirements.txt /tmp/requirements.txt
  ---> Using cache
- ---> b1fe1619fc32
-Step 4/9 : ADD requirements.txt /tmp/requirements.txt
+ ---> 38eee3cce847
+Step 4/9 : RUN pip install -r /tmp/requirements.txt
  ---> Using cache
- ---> f13593d70c5d
-Step 5/9 : RUN pip install -r /tmp/requirements.txt
+ ---> d872ee4d3ed0
+Step 5/9 : RUN mkdir /data
  ---> Using cache
- ---> 2a63ab14abb4
-Step 6/9 : RUN mkdir /data
+ ---> acf1704e22e1
+Step 6/9 : RUN mkdir /log
  ---> Using cache
- ---> d2331cd7c967
+ ---> a0e82b187ff7
 Step 7/9 : ADD app /app
  ---> Using cache
- ---> 394f5317655b
+ ---> 72f63d819973
 Step 8/9 : WORKDIR /app
  ---> Using cache
- ---> 68e4724b652f
-Step 9/9 : ENTRYPOINT ["sh", "-c" , "crond -f"]
+ ---> b0fd5ba999a3
+Step 9/9 : ENTRYPOINT ["/docker-entrypoint.sh"]
  ---> Using cache
- ---> 677d6091020d
-Successfully built 677d6091020d
+ ---> 2453fe7bcf18
+Successfully built 2453fe7bcf18
 Successfully tagged tempered-iron_main_service:latest
-Creating tempered-iron_main_service_1 ... done
+Starting tempered-iron_main_service_1 ... done
 Attaching to tempered-iron_main_service_1
+main_service_1  | [*] Verifying permissions of the service crontab at '/etc/cron.d/service-crontab'…
+main_service_1  | /docker-entrypoint.sh: line 4: /etc/cron.d/service-crontab: Permission denied
+main_service_1  | [*] Installing crontab from …
+main_service_1  | [*] Showing installed cron jobs…
+main_service_1  | * * * * * python3 /app/run.py
+main_service_1  | 
+main_service_1  | 
+main_service_1  | [*] Starting cron daemon…
 ```
 
 Once started, the deployed container will start a cron service to run schedule tasks.
@@ -139,7 +142,7 @@ Options:
 $ docker compose logs -f
 ```
 
-Once started, the deployed container will start a cron service to run scheduled tasks as stated in the `/etc/crontabs/root` file within the container.
+Once started, the deployed container will start a cron service to run scheduled tasks as stated in the `/etc/cron.d/servuce-crontab` file within the container.
 In this context, the scheduled task is as simple as grabbing the public IP address and logging it both, in the terminal and in a specific log file under `/log` in the container and in a volume mounted in the host.
 
 ### Basic debugging
@@ -154,10 +157,10 @@ To do so:
 ```
 $ docker ps
 CONTAINER ID   IMAGE                            COMMAND                  CREATED          STATUS              PORTS     NAMES
-29a49899accb   temperediron_main_service   "sh -c 'crond -f' sh…"   21 seconds ago   Up 20 seconds                 temperediron_main_service_1
+3efb87232dd4   tempered-iron_main_service   "/docker-entrypoint.…"   2 minutes ago   Up 10 seconds             tempered-iron_main_service_1
 ```
 
-2. Identify the `CONTAINER ID`. In this case, `29a49899accb`.
+2. Identify the `CONTAINER ID`. In this case, `3efb87232dd4`.
 
 3. Logging into the container:
 

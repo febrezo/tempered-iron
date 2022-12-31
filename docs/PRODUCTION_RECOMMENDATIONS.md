@@ -97,14 +97,14 @@ If you have already run the container, you can check the running ones using `doc
 ```
 $ docker ps
 CONTAINER ID   IMAGE                       COMMAND                  CREATED         STATUS         PORTS     NAMES
-cf5d42a2da7d   temperediron_main_service   "sh -c 'crond -f' sh…"   2 minutes ago   Up 2 minutes             temperediron_main_service_1
+3efb87232dd4   tempered-iron_main_service   "/docker-entrypoint.…"   2 minutes ago   Up 10 seconds             tempered-iron_main_service_1
 ```
 
 In this case, entering the container is as simple as entering the container with a shell in interactive mode (`-it`).
 Note that the default shell of Alpine containers is `sh`, but use `bash` if it is available in the Docker image you used as a base image.
 
 ```
-$ docker exec -it cf5d42a2da7d sh
+$ docker exec -it 3efb87232dd4 sh
 /app # whoami
 root
 /app # ls

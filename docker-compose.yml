@@ -3,7 +3,6 @@ version: '3.5'
 services:
   main_service:
     build: .
-    command: sh -c "crond -f"
     #restart: unless-stopped
     environment:
       - APP_NAME=${APP_NAME}
@@ -12,4 +11,4 @@ services:
     volumes:
       - ./volumes/data:/data
       - ./volumes/log:/log
-      - ./config/${ENVIRONMENT:-dev}/crontabs:/etc/crontabs
+      - ./config/${ENVIRONMENT:-dev}/cron.d:/etc/cron.d

@@ -1,6 +1,6 @@
 config/pre/*.env
 config/pro/*.env
-config/pre/crontabs/*
-config/pro/crontabs/*
+config/pre/cron.d/*
+config/pro/cron.d/*
 .env
 volumes

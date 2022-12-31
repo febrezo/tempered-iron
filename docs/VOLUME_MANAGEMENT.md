@@ -53,7 +53,7 @@ services
     volumes:
       - data_vol:/data
       - log_vol:/log
-      - ./config/${ENVIRONMENT:-dev}/crontabs:/etc/crontabs
+      - ./config/${ENVIRONMENT:-dev}/cron.d:/etc/cron.d
 
 volumes:
   data_vol:
@@ -73,7 +73,7 @@ services
     volumes:
       - data_vol:/data
       - log_vol:/log
-      - ./config/${ENVIRONMENT:-dev}/crontabs:/etc/crontabs
+      - ./config/${ENVIRONMENT:-dev}/cron.d:/etc/cron.d
 volumes:
   data_vol:
     name: pro_data_vol
@@ -86,5 +86,5 @@ volumes:
 This is good because different environments can be used safely in a single machine without mixing others.
 Of course, additional volumes can be added depending on the needs.
 
-The only exception as shown above is the example of the configuration of how the `/etc/crontabs/` is mapped from the host.
-This information is grabbed from the `./config/${ENVIRONMENT}/crontabs` folder meaning that the scheduled tasks can be mapped at deployment time.
+The only exception as shown above is the example of the configuration of how the `/etc/cron.d/` is mapped from the host.
+This information is grabbed from the `./config/${ENVIRONMENT}/cron.d` folder meaning that the scheduled tasks can be mapped at deployment time.
